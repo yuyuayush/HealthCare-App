@@ -1,42 +1,27 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
-import StatusBadge from "./StatusBadge";
-import { formatDateTime } from "@/lib/utils";
-import { Doctors } from "@/constants";
 import Image from "next/image";
-import AppointmentModal from "../AppointmentModal";
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
 
-const columns: ColumnDef<Payment>[] = [
+import { Doctors } from "@/constants";
+import { formatDateTime } from "@/lib/utils";
+import { Appointment } from "@/types/appwrite.type";
+import StatusBadge from "./StatusBadge";
+import AppointmentModal from "../AppointmentModal";
+
+const columns: ColumnDef<Appointment>[] = [
   {
     header: "#",
     cell: ({ row }) => {
-      return <p className="text-14-medium">{row.index + 1}</p>;
+      return <p className="text-14-medium ">{row.index + 1}</p>;
     },
   },
   {
     accessorKey: "patient",
     header: "Patient",
     cell: ({ row }) => {
-      return <p className="text-14-medium">{row.original.patient.name}</p>;
+      const appointment = row.original;
+      return <p className="text-14-medium ">{appointment.patient.name}</p>;
     },
   },
   {
@@ -45,7 +30,7 @@ const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => {
       const appointment = row.original;
       return (
-        <div className="min-w-[113px]">
+        <div className="min-w-[115px]">
           <StatusBadge status={appointment.status} />
         </div>
       );
@@ -64,13 +49,15 @@ const columns: ColumnDef<Payment>[] = [
     },
   },
   {
-    accessorKey: "PrimaryPhysician",
+    accessorKey: "primaryPhysician",
     header: "Doctor",
     cell: ({ row }) => {
       const appointment = row.original;
+
       const doctor = Doctors.find(
         (doctor) => doctor.name === appointment.primaryPhysician
       );
+
       return (
         <div className="flex items-center gap-3">
           <Image
@@ -90,6 +77,7 @@ const columns: ColumnDef<Payment>[] = [
     header: () => <div className="pl-4">Actions</div>,
     cell: ({ row }) => {
       const appointment = row.original;
+
       return (
         <div className="flex gap-1">
           <AppointmentModal
@@ -100,8 +88,7 @@ const columns: ColumnDef<Payment>[] = [
             title="Schedule Appointment"
             description="Please confirm the following details to schedule."
           />
-
-        <AppointmentModal
+          <AppointmentModal
             patientId={appointment.patient.$id}
             userId={appointment.userId}
             appointment={appointment}

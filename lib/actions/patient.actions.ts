@@ -1,6 +1,6 @@
 "use server";
 
-import { ID, InputFile, Query } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 import { parseStringify } from "../utils";
 import {
   BUCKET_ID,
@@ -56,16 +56,7 @@ export const registerPatient = async ({
   try {
     // Upload file ->  // https://appwrite.io/docs/references/cloud/client-web/storage#createFile
     let file;
-    if (identificationDocument) {
-      const inputFile =
-        identificationDocument &&
-        InputFile.fromBlob(
-          identificationDocument?.get("blobFile") as Blob,
-          identificationDocument?.get("fileName") as string
-        );
-
-      file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
-    }
+  
 
     // Create new patient document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
     const newPatient = await databases.createDocument(
@@ -73,10 +64,6 @@ export const registerPatient = async ({
       PATIENT_COLLECTION_ID!,
       ID.unique(),
       {
-        identificationDocumentId: file?.$id ? file.$id : null,
-        identificationDocumentUrl: file?.$id
-          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
-          : null,
         ...patient,
       }
     );
